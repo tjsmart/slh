@@ -1,3 +1,7 @@
+"""
+Generate files for next day/part.
+"""
+
 from __future__ import annotations
 
 import json
@@ -18,14 +22,14 @@ from typing import NoReturn
 
 from ._command_factory import Command
 from ._command_factory import register_command
-from ._helpers import DayPart
-from ._helpers import get_all_dayparts
-from ._helpers import get_cookie_headers
-from ._helpers import get_rootdir
-from ._helpers import get_year
-from ._helpers import HandledError
-from ._helpers import THIS_DIR
+from ._daypart import DayPart
+from ._daypart import get_all_dayparts
+from ._daypart import get_year
 from ._prompt_html_parser import parse_prompt_html_to_md
+from ._random_shit import get_cookie_headers
+from ._random_shit import get_rootdir
+from ._random_shit import HandledError
+from ._random_shit import THIS_DIR
 
 
 __all__ = [
@@ -45,7 +49,7 @@ def main() -> int:
 
 
 def _fill_parser(parser: ArgumentParser) -> None:
-    parser.description = "Generate files for next day/part."
+    parser.description = __doc__
 
 
 register_command(Command("next", main, _fill_parser))

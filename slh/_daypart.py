@@ -1,23 +1,20 @@
 from __future__ import annotations
 
 import importlib
-import logging
 import os
 import re
-import subprocess
-import sys
 import warnings
 from collections.abc import Callable
 from dataclasses import dataclass
 from dataclasses import field
-from enum import Enum
 from functools import lru_cache
 from pathlib import Path
 from typing import NamedTuple
 
+from ._random_shit import get_rootdir
+from ._random_shit import HandledError
 
-logger = logging.getLogger("aoc.lib")
-THIS_DIR = Path(__file__).resolve().parent
+
 _PARTFILE = re.compile(r".*/day(\d\d)/part(\d)\.py")
 type Solution[T] = Callable[[str], T]
 _EMOJI_LIST = [
@@ -131,21 +128,6 @@ class DayPart(NamedTuple):
         return True
 
 
-class HandledError(RuntimeError):
-    ...
-
-
-@lru_cache(maxsize=1)
-def get_rootdir() -> Path:
-    result = subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    return Path(result.stdout.strip())
-
-
 @lru_cache(maxsize=1)
 def get_year() -> int:
     rootdir = get_rootdir()
@@ -205,26 +187,3 @@ def get_selections(dayparts: list[DayPart], args: SelectionArgs) -> list[DayPart
 
     parts = parts or [1, 2]
     return [dp for dp in dayparts if dp.day in days and dp.part in parts]
-
-
-def get_cookie_headers() -> dict[str, str]:
-    session_file = get_rootdir() / ".session"
-    return {"Cookie": f"session={session_file.read_text().strip()}"}
-
-
-class Color(Enum):
-    RedText = 31
-    GreenText = 32
-    YellowText = 33
-    BlueText = 34
-
-    RedBack = 41
-    GreenBack = 42
-    YellowBack = 43
-    BlueBack = 44
-
-    def format(self, text: str) -> str:
-        if sys.stdout.isatty():
-            return f"\033[{self.value}m{text}\033[0m"  # ]]
-        else:
-            return text

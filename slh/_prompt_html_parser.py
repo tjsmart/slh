@@ -1,7 +1,7 @@
 import textwrap
 from html.parser import HTMLParser
 
-from ._helpers import logger
+from ._random_shit import logger
 
 
 __all__ = [

@@ -2,25 +2,25 @@ import re
 from collections import defaultdict
 from html.parser import HTMLParser
 
-from ._helpers import logger
+from ._random_shit import logger
 
 
 __all__ = [
     "parse_calendar_stars_html_to_star_count",
 ]
 
-NoStarRegex = re.compile(r"^Day (\d\d?)$")
-OneStarRegex = re.compile(r"^Day (\d\d?), one star$")
-TwoStarRegex = re.compile(r"^Day (\d\d?), two stars$")
+_NoStarRegex = re.compile(r"^Day (\d\d?)$")
+_OneStarRegex = re.compile(r"^Day (\d\d?), one star$")
+_TwoStarRegex = re.compile(r"^Day (\d\d?), two stars$")
 
 
 def parse_calendar_stars_html_to_star_count(html: str) -> list[int]:
-    parser = CalendarStarsHTMLParser()
+    parser = _CalendarStarsHTMLParser()
     parser.feed(html)
     return parser.get_result()
 
 
-class CalendarStarsHTMLParser(HTMLParser):
+class _CalendarStarsHTMLParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
         self._stars: defaultdict[int, int] = defaultdict(int)
@@ -37,7 +37,7 @@ class CalendarStarsHTMLParser(HTMLParser):
             return
 
         for regex, star_value in zip(
-            (NoStarRegex, OneStarRegex, TwoStarRegex), (0, 1, 2)
+            (_NoStarRegex, _OneStarRegex, _TwoStarRegex), (0, 1, 2)
         ):
             if not (re_match := regex.match(label)):
                 continue

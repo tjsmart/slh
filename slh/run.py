@@ -1,3 +1,8 @@
+"""
+Execute specified solutions, by default the most
+recent solution is executed.
+"""
+
 import time
 from argparse import ArgumentParser
 from collections.abc import Callable
@@ -5,11 +10,11 @@ from dataclasses import dataclass
 
 from ._command_factory import Command
 from ._command_factory import register_command
-from ._helpers import Color
-from ._helpers import DayPart
-from ._helpers import get_all_dayparts
-from ._helpers import get_selections
-from ._helpers import SelectionArgs
+from ._daypart import DayPart
+from ._daypart import get_all_dayparts
+from ._daypart import get_selections
+from ._daypart import SelectionArgs
+from ._random_shit import Color
 
 
 __all__ = [
@@ -18,7 +23,14 @@ __all__ = [
 ]
 
 
-def main(all: bool, days: list[int], parts: list[int], test: bool, count: int, unknown_args: list[str]) -> int:
+def main(
+    all: bool,
+    days: list[int],
+    parts: list[int],
+    test: bool,
+    count: int,
+    unknown_args: list[str],
+) -> int:
     args = _Args(all, days, parts, test, count)
     dayparts = get_all_dayparts()
     selections = get_selections(dayparts, args)
@@ -28,11 +40,9 @@ def main(all: bool, days: list[int], parts: list[int], test: bool, count: int, u
     else:
         return run_selections(selections, count=args.count)
 
+
 def _fill_parser(parser: ArgumentParser) -> None:
-    parser.description = (
-            "Execute specified solutions, by default the most recent solution"
-            " is executed"
-        )
+    parser.description = __doc__
 
     parser.add_argument("--all", default=False, action="store_true")
     parser.add_argument("--days", type=int, action="append")
@@ -74,7 +84,9 @@ def run_selections(selections: list[DayPart], *, count: int = 1) -> int:
         match result:
             case Cancelled(duration):
                 dstr = _format_duration(duration)
-                print(f"{Color.YellowText.format(f"solution cancelled after {dstr}")} 🛑")
+                print(
+                    f"{Color.YellowText.format(f"solution cancelled after {dstr}")} 🛑"
+                )
                 return 1
 
             case Finished(None, _):
@@ -86,19 +98,27 @@ def run_selections(selections: list[DayPart], *, count: int = 1) -> int:
                 if dp.is_solved():
                     correct = str(result) == dp.solutionfile.read_text()
                     if correct:
-                        print(f"{Color.GreenText.format(f"{result = :15d}, duration = {dstr:>8s}")} ✅")
+                        print(
+                            f"{Color.GreenText.format(f"{result = :15d}, duration = {dstr:>8s}")} ✅"
+                        )
                     else:
-                        print(f"{Color.RedText.format(f"{result = :15d}, duration = {dstr:>8s}")} ❌")
+                        print(
+                            f"{Color.RedText.format(f"{result = :15d}, duration = {dstr:>8s}")} ❌"
+                        )
                         rtc |= 1
                 else:
                     if dp.add_guess(str(result)):
                         dp.solutionfile.write_text(str(result))
-                        print(f"{Color.BlueText.format(f"{result = }, duration = {dstr}")} 🚀")
+                        print(
+                            f"{Color.BlueText.format(f"{result = }, duration = {dstr}")} 🚀"
+                        )
                         from .submit import submit_daypart
 
                         rtc |= submit_daypart(dp)
                     else:
-                        print(f"{Color.RedText.format(f"{result = }, duration = {dstr}")} ❌")
+                        print(
+                            f"{Color.RedText.format(f"{result = }, duration = {dstr}")} ❌"
+                        )
                         rtc |= 1
 
     return rtc
@@ -129,7 +149,9 @@ class Cancelled:
 type SolutionResult[R] = Finished[R] | Cancelled
 
 
-def time_it[R, **P](solution: Callable[P, R], *args: P.args, **kwargs: P.kwargs,) -> SolutionResult[R]:
+def time_it[
+    R, **P
+](solution: Callable[P, R], *args: P.args, **kwargs: P.kwargs,) -> SolutionResult[R]:
     start = time.monotonic_ns()
     try:
         result = solution(*args, **kwargs)

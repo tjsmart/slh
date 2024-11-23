@@ -1,3 +1,7 @@
+"""
+Submit the specified solutions, by default the most
+recent solution is submitted.
+"""
 from __future__ import annotations
 
 import re
@@ -8,16 +12,16 @@ from argparse import ArgumentParser
 from enum import Enum
 from pathlib import Path
 
-from . import next
+from . import next as next_mod
 from ._calendar_html_parser import parse_calendar_stars_html_to_star_count
 from ._command_factory import Command
 from ._command_factory import register_command
-from ._helpers import Color
-from ._helpers import DayPart
-from ._helpers import get_all_dayparts
-from ._helpers import get_cookie_headers
-from ._helpers import get_rootdir
-from ._helpers import get_year
+from ._daypart import DayPart
+from ._daypart import get_all_dayparts
+from ._daypart import get_year
+from ._random_shit import Color
+from ._random_shit import get_cookie_headers
+from ._random_shit import get_rootdir
 
 
 __all__ = [
@@ -38,10 +42,7 @@ def main() -> int:
 
 
 def _fill_parser(parser: ArgumentParser) -> None:
-    parser.description = (
-        "Submit the specified solutions, by default the most"
-        " recent solution is submitted."
-    )
+    parser.description = __doc__
 
 
 register_command(Command("submit", main, _fill_parser))
@@ -72,7 +73,7 @@ def submit_daypart(dp: DayPart) -> int:
 
     if dp.part == 1:
         # time for the next part!
-        return next.main([])
+        return next_mod.main()
 
     return 0
 

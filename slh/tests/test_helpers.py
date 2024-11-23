@@ -3,12 +3,12 @@ from dataclasses import dataclass
 
 import pytest
 
-from .._helpers import DayPart
-from .._helpers import get_all_dayparts
-from .._helpers import get_rootdir
-from .._helpers import get_selections
-from .._helpers import HandledError
-from .._helpers import SelectionArgs
+from .._random_shit import DayPart
+from .._random_shit import get_all_dayparts
+from .._random_shit import get_rootdir
+from .._random_shit import get_selections
+from .._random_shit import HandledError
+from .._random_shit import SelectionArgs
 
 
 def test_daypart_next_raises_on_last_day():
@@ -31,7 +31,7 @@ def test_get_rootdir():
 
     rootdir = str(get_rootdir())
 
-    assert re.match(r'.*/aoc\d\d\d\d', rootdir)
+    assert re.match(r".*/aoc\d\d\d\d", rootdir)
 
 
 @pytest.mark.usefixtures("rootdir")
@@ -65,6 +65,7 @@ class SelectionTestCase:
 
 default = list(map(lambda x: DayPart(*x), [(1, 1), (1, 2), (2, 1), (2, 2), (3, 1)]))
 
+
 @pytest.mark.parametrize(
     "case",
     [
@@ -73,15 +74,35 @@ default = list(map(lambda x: DayPart(*x), [(1, 1), (1, 2), (2, 1), (2, 2), (3, 1
         SelectionTestCase(default, SelectionArgs(parts=[1]), [DayPart(3, 1)]),
         SelectionTestCase(default, SelectionArgs(parts=[1, 2]), [DayPart(3, 1)]),
         SelectionTestCase(default, SelectionArgs(parts=[2]), []),
-        SelectionTestCase(default, SelectionArgs(days=[1]), [DayPart(1, 1), DayPart(1, 2)]),
-        SelectionTestCase(default, SelectionArgs(days=[2]), [DayPart(2, 1), DayPart(2, 2)]),
+        SelectionTestCase(
+            default, SelectionArgs(days=[1]), [DayPart(1, 1), DayPart(1, 2)]
+        ),
+        SelectionTestCase(
+            default, SelectionArgs(days=[2]), [DayPart(2, 1), DayPart(2, 2)]
+        ),
         SelectionTestCase(default, SelectionArgs(days=[5]), []),
-        SelectionTestCase(default, SelectionArgs(days=[2, 3], parts=[1]), [DayPart(2, 1), DayPart(3, 1)]),
-        SelectionTestCase(default, SelectionArgs(days=[2, 3], parts=[1, 2]), [DayPart(2, 1), DayPart(2, 2), DayPart(3, 1)]),
-        SelectionTestCase(default, SelectionArgs(days=[2, 3], parts=[2]), [DayPart(2, 2)]),
+        SelectionTestCase(
+            default,
+            SelectionArgs(days=[2, 3], parts=[1]),
+            [DayPart(2, 1), DayPart(3, 1)],
+        ),
+        SelectionTestCase(
+            default,
+            SelectionArgs(days=[2, 3], parts=[1, 2]),
+            [DayPart(2, 1), DayPart(2, 2), DayPart(3, 1)],
+        ),
+        SelectionTestCase(
+            default, SelectionArgs(days=[2, 3], parts=[2]), [DayPart(2, 2)]
+        ),
         SelectionTestCase(default, SelectionArgs(all=True), default),
-        SelectionTestCase(default, SelectionArgs(all=True, parts=[1]), [DayPart(1, 1), DayPart(2, 1), DayPart(3, 1)]),
-        SelectionTestCase(default, SelectionArgs(all=True, parts=[2]), [DayPart(1, 2), DayPart(2, 2)]),
+        SelectionTestCase(
+            default,
+            SelectionArgs(all=True, parts=[1]),
+            [DayPart(1, 1), DayPart(2, 1), DayPart(3, 1)],
+        ),
+        SelectionTestCase(
+            default, SelectionArgs(all=True, parts=[2]), [DayPart(1, 2), DayPart(2, 2)]
+        ),
         SelectionTestCase(default, SelectionArgs(all=True, parts=[1, 2]), default),
     ],
     ids=repr,

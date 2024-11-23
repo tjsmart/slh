@@ -5,13 +5,16 @@ from unittest.mock import patch
 
 import pytest
 
-from .. import _helpers
+from .. import _random_shit
 
 
 @pytest.fixture
 def rootdir():
     startingdir = Path.cwd()
-    with patch.object(_helpers, "get_rootdir") as mock_get_rootdir, TemporaryDirectory() as tempd:
+    with (
+        patch.object(_random_shit, "get_rootdir") as mock_get_rootdir,
+        TemporaryDirectory() as tempd,
+    ):
         rootdir = Path(tempd) / "aoc1994"
         rootdir.mkdir(exist_ok=True, parents=True)
         mock_get_rootdir.return_value = rootdir
