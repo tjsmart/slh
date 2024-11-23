@@ -8,7 +8,6 @@ import time
 import urllib.error
 import urllib.request
 from argparse import ArgumentParser
-from collections.abc import Sequence
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
@@ -17,6 +16,8 @@ from itertools import cycle
 from pathlib import Path
 from typing import NoReturn
 
+from ._command_factory import Command
+from ._command_factory import register_command
 from ._helpers import DayPart
 from ._helpers import get_all_dayparts
 from ._helpers import get_cookie_headers
@@ -27,10 +28,13 @@ from ._helpers import THIS_DIR
 from ._prompt_html_parser import parse_prompt_html_to_md
 
 
-def main(argv: Sequence[str] | None = None) -> int:
-    parser = ArgumentParser(description="Generate files for next day/part.")
-    _ = parser.parse_args(argv)
+__all__ = [
+    "main",
+    "create_next_files",
+]
 
+
+def main() -> int:
     try:
         _main()
     except (HandledError, subprocess.CalledProcessError) as ex:
@@ -38,6 +42,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 1
 
     return 0
+
+
+def _fill_parser(parser: ArgumentParser) -> None:
+    parser.description = "Generate files for next day/part."
+
+
+register_command(Command("next", main, _fill_parser))
 
 
 def _main() -> None:
@@ -51,8 +62,10 @@ def _main() -> None:
 
 
 def _check_if_ready(year: int, day: int) -> None:
-    released_at = datetime(year=year, month=12, day=day, hour=0, tzinfo=timezone(timedelta(hours=-5)))
-    spinner = cycle(['⣾', '⣷', '⣯', '⣟', '⡿', '⢿', '⣻', '⣽'])
+    released_at = datetime(
+        year=year, month=12, day=day, hour=0, tzinfo=timezone(timedelta(hours=-5))
+    )
+    spinner = cycle(["⣾", "⣷", "⣯", "⣟", "⡿", "⢿", "⣻", "⣽"])
     try:
         while True:
             now = datetime.now(UTC)
@@ -69,7 +82,10 @@ def _check_if_ready(year: int, day: int) -> None:
 
             wait_str = _format_timedelta(time_to_wait)
             spinner_icon = next(spinner)
-            print(f"\rwaiting for the next input to go live! {wait_str} {spinner_icon}", end="")
+            print(
+                f"\rwaiting for the next input to go live! {wait_str} {spinner_icon}",
+                end="",
+            )
             time.sleep(0.1)
 
     except KeyboardInterrupt:
@@ -104,16 +120,15 @@ def _open(next: DayPart) -> NoReturn:
         "bash",
         "bash",
         "-c",
-        (
-            f"{sys.executable} -m pip install -e . -qqq"
-            f" & {exit_cmd}"
-        ),
+        (f"{sys.executable} -m pip install -e . -qqq" f" & {exit_cmd}"),
     )
 
 
 def _in_nvim() -> bool:
     cur_pid = os.getpid()
-    result = subprocess.run(["pstree", "-aps", str(cur_pid)], capture_output=True, text=True)
+    result = subprocess.run(
+        ["pstree", "-aps", str(cur_pid)], capture_output=True, text=True
+    )
     if result.returncode:
         print("... failed to check if we are in neovim :/")
         return False
@@ -126,10 +141,10 @@ def _configure_harpoon_files(next: DayPart) -> None:
         data = json.loads(harpoon_json_file.read_text())
         repodir = str(get_rootdir())
 
-        data['projects'][repodir]['mark']['marks'] = [
-            {'col': 0, 'row': 0, 'filename': str(next.promptfile.relative_to(repodir))},
-            {'col': 0, 'row': 0, 'filename': str(next.pyfile.relative_to(repodir))},
-            {'col': 0, 'row': 0, 'filename': str(next.inputfile.relative_to(repodir))},
+        data["projects"][repodir]["mark"]["marks"] = [
+            {"col": 0, "row": 0, "filename": str(next.promptfile.relative_to(repodir))},
+            {"col": 0, "row": 0, "filename": str(next.pyfile.relative_to(repodir))},
+            {"col": 0, "row": 0, "filename": str(next.inputfile.relative_to(repodir))},
         ]
 
         harpoon_json_file.write_text(json.dumps(data))

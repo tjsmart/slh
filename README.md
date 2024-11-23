@@ -1,6 +1,6 @@
 # Santa's Little Helper
 
-Scripts for [Advent of Code](https://adventofcode.com/).
+Scripts for [Advent of Code](https://adventofcode.com).
 
 ```console
 slh next ...

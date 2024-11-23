@@ -1,16 +1,17 @@
 from __future__ import annotations
 
-import argparse
 import re
 import urllib.error
 import urllib.parse
 import urllib.request
-from collections.abc import Sequence
+from argparse import ArgumentParser
 from enum import Enum
 from pathlib import Path
 
 from . import next
 from ._calendar_html_parser import parse_calendar_stars_html_to_star_count
+from ._command_factory import Command
+from ._command_factory import register_command
 from ._helpers import Color
 from ._helpers import DayPart
 from ._helpers import get_all_dayparts
@@ -19,21 +20,31 @@ from ._helpers import get_rootdir
 from ._helpers import get_year
 
 
-def main(argv: Sequence[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
-        description=(
-            "Submit the specified solutions, by default the most recent solution"
-            " is submitted"
-        ),
-    )
-    _ = parser.parse_args(argv)
+__all__ = [
+    "main",
+    "submit_daypart",
+    "submit_day25_part2",
+    "submit_solution",
+]
 
+
+def main() -> int:
     dayparts = get_all_dayparts()
     if not dayparts:
         raise SystemExit("error: no files exist yet to submit!")
 
     most_recent = dayparts.pop()
     return submit_daypart(most_recent)
+
+
+def _fill_parser(parser: ArgumentParser) -> None:
+    parser.description = (
+        "Submit the specified solutions, by default the most"
+        " recent solution is submitted."
+    )
+
+
+register_command(Command("submit", main, _fill_parser))
 
 
 def submit_daypart(dp: DayPart) -> int:
@@ -46,6 +57,7 @@ def submit_daypart(dp: DayPart) -> int:
     if dp.solutionfile.stat().st_mtime < dp.pyfile.stat().st_mtime:
         print("solution has been modified, executing `run` again ...")
         from .run import run_selections
+
         if rtc := run_selections([dp]):
             return rtc
 
@@ -118,6 +130,7 @@ def _parse_post_contents(contents: str) -> int:
 # That's not the right answer; your answer is too high.
 # That's the right answer!
 
+
 class _ErrorRegex(Enum):
     TOO_QUICK = re.compile("You gave an answer too recently.*to wait.")
     WRONG = re.compile(r"That's not the right answer.*?\.")
@@ -184,8 +197,6 @@ def _star_count_to_md_table(stars: list[int]) -> list[str]:
         for day, count in enumerate(stars, 1)
     )
     return lines
-
-
 
 
 if __name__ == "__main__":

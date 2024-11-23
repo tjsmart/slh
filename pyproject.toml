@@ -1,20 +1,15 @@
 [project]
-name = "aoc2023"
+name = "slh"
 version = "0.0.0"
 authors = [{ name="Tyler Smart", email="tjsmart@ucsc.edu" }]
-description = "Advent of Code 2023 solutions"
+description = "Scripts for Advent of Code."
 requires-python = ">=3.12"
-dependencies = [
-    "numpy ~= 1.26",
-]
 
 [project.urls]
-"Homepage" = "https://github.com/tjsmart/aoc2023"
+"Homepage" = "https://github.com/tjsmart/slh"
 
 [project.scripts]
-run = "lib.run:main"
-next = "lib.next:main"
-submit = "lib.submit:main"
+slh = "slh._main:main"
 
 [project.optional-dependencies]
 dev = ["pytest==7.4.3"]
@@ -24,7 +19,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["day*", "lib*"]
+include = ["slh"]
 exclude = ["*tests*"]
 
 [tool.pyright]
