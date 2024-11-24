@@ -11,9 +11,9 @@ from dataclasses import dataclass
 from ._command_factory import Command
 from ._command_factory import register_command
 from ._daypart import DayPart
-from ._daypart import get_all_dayparts
 from ._daypart import get_selections
 from ._daypart import SelectionArgs
+from ._plugin_factory import plugin
 from ._random_shit import Color
 
 
@@ -32,11 +32,11 @@ def main(
     unknown_args: list[str],
 ) -> int:
     args = _Args(all, days, parts, test, count)
-    dayparts = get_all_dayparts()
+    dayparts = plugin().get_all_dayparts()
     selections = get_selections(dayparts, args)
 
     if args.test:
-        return _test_selections(selections, unknown_args)
+        return plugin().run_daypart_tests(selections, unknown_args)
     else:
         return run_selections(selections, count=args.count)
 
@@ -60,18 +60,18 @@ def run_selections(selections: list[DayPart], *, count: int = 1) -> int:
 
     rtc = 0
     for dp in selections:
-        input = dp.inputfile.read_text()
-        solution = dp.load_solution()
         print(f"{dp.emoji} ({dp.day:02}/{dp.part}) ➡️ ", end="")
 
         if not dp.is_solved() and len(selections) > 1:
             print(f"{Color.YellowText.format("problem is unsolved")} 🤔")
             continue
 
+        solution = plugin().load_solution(dp)
+
         total_time = 0
         result = None
         for _ in range(count):
-            result = time_it(solution, input)
+            result = time_it(solution, dp.inputfile)
             if isinstance(result, Cancelled):
                 break
 
@@ -122,17 +122,6 @@ def run_selections(selections: list[DayPart], *, count: int = 1) -> int:
                         rtc |= 1
 
     return rtc
-
-
-def _test_selections(
-    selections: list[DayPart],
-    pytest_args: list[str] | None = None,
-) -> int:
-    import pytest
-
-    args = [*pytest_args, "--"] if pytest_args else ["--"]
-    args.extend(str(dp.pyfile) for dp in selections)
-    return pytest.main(args)
 
 
 @dataclass
@@ -190,7 +179,3 @@ def _format_duration(duration_ns: int) -> str:
 class _Args(SelectionArgs):
     test: bool = False
     count: int = 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

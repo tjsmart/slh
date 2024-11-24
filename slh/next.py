@@ -23,13 +23,12 @@ from typing import NoReturn
 from ._command_factory import Command
 from ._command_factory import register_command
 from ._daypart import DayPart
-from ._daypart import get_all_dayparts
 from ._daypart import get_year
 from ._prompt_html_parser import parse_prompt_html_to_md
 from ._random_shit import get_cookie_headers
 from ._random_shit import get_rootdir
 from ._random_shit import HandledError
-from ._random_shit import THIS_DIR
+from ._plugin_factory import plugin
 
 
 __all__ = [
@@ -42,7 +41,9 @@ def main() -> int:
     try:
         _main()
     except (HandledError, subprocess.CalledProcessError) as ex:
-        print("error:", ex)
+        print("error:", ex, file=sys.stderr)
+        if ex.__cause__ is not None:
+            print("cause:", ex.__cause__, file=sys.stderr)
         return 1
 
     return 0
@@ -67,7 +68,11 @@ def _main() -> None:
 
 def _check_if_ready(year: int, day: int) -> None:
     released_at = datetime(
-        year=year, month=12, day=day, hour=0, tzinfo=timezone(timedelta(hours=-5))
+        year=year,
+        month=12,
+        day=day,
+        hour=0,
+        tzinfo=timezone(timedelta(hours=-5)),
     )
     spinner = cycle(["⣾", "⣷", "⣯", "⣟", "⡿", "⢿", "⣻", "⣽"])
     try:
@@ -140,15 +145,30 @@ def _in_nvim() -> bool:
 
 
 def _configure_harpoon_files(next: DayPart) -> None:
-    harpoon_json_file = Path().home() / ".local" / "share" / "nvim" / "harpoon.json"
+    harpoon_json_file = (
+        Path().home() / ".local" / "share" / "nvim" / "harpoon.json"
+    )
     try:
         data = json.loads(harpoon_json_file.read_text())
         repodir = str(get_rootdir())
+        next_src_file = plugin().get_src_file(next)
 
         data["projects"][repodir]["mark"]["marks"] = [
-            {"col": 0, "row": 0, "filename": str(next.promptfile.relative_to(repodir))},
-            {"col": 0, "row": 0, "filename": str(next.pyfile.relative_to(repodir))},
-            {"col": 0, "row": 0, "filename": str(next.inputfile.relative_to(repodir))},
+            {
+                "col": 0,
+                "row": 0,
+                "filename": str(next.promptfile.relative_to(repodir)),
+            },
+            {
+                "col": 0,
+                "row": 0,
+                "filename": str(next_src_file.relative_to(repodir)),
+            },
+            {
+                "col": 0,
+                "row": 0,
+                "filename": str(next.inputfile.relative_to(repodir)),
+            },
         ]
 
         harpoon_json_file.write_text(json.dumps(data))
@@ -159,21 +179,10 @@ def _configure_harpoon_files(next: DayPart) -> None:
 
 def create_next_files(year: int, next: DayPart, prev: DayPart | None) -> None:
     print(f"Generating files for day {next.day} part {next.part}:")
-
     next.outdir.mkdir(exist_ok=True, parents=True)
     print(f"... {next.outdir} created ✅")
 
-    assert not next.pyfile.exists(), f"Whoops, {next.pyfile} already exists!"
-
-    if not prev or next.part == 1:
-        prev_src = (THIS_DIR / "template_part.py").read_text()
-    else:
-        prev_src = prev.pyfile.read_text()
-
-    next.pyfile.write_text(prev_src)
-    print(f"... {next.pyfile} written ✅")
-
-    (next.outdir / "__init__.py").touch(exist_ok=True)
+    plugin().generate_next_files(year, next, prev)
 
     if next.part == 1:
         _download_input(year, next)
@@ -230,7 +239,7 @@ def _get_prompt_html(year: int, day: int) -> str:
 
 
 def _get_prev_and_next() -> tuple[DayPart | None, DayPart]:
-    dps = get_all_dayparts()
+    dps = plugin().get_all_dayparts()
     prev = dps[-1] if dps else None
     next = prev.next() if prev else DayPart.first()
     return prev, next

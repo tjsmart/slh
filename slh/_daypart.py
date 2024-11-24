@@ -1,10 +1,6 @@
 from __future__ import annotations
 
-import importlib
 import os
-import re
-import warnings
-from collections.abc import Callable
 from dataclasses import dataclass
 from dataclasses import field
 from functools import lru_cache
@@ -15,8 +11,14 @@ from ._random_shit import get_rootdir
 from ._random_shit import HandledError
 
 
-_PARTFILE = re.compile(r".*/day(\d\d)/part(\d)\.py")
-type Solution[T] = Callable[[str], T]
+__all__ = [
+    "DayPart",
+    "get_year",
+    "SelectionArgs",
+    "get_selections",
+]
+
+
 _EMOJI_LIST = [
     "🔔",  # 1
     "📦",  # 2
@@ -55,10 +57,6 @@ class DayPart(NamedTuple):
         return get_rootdir() / f"day{self.day:02}"
 
     @property
-    def pyfile(self) -> Path:
-        return self.outdir / f"part{self.part}.py"
-
-    @property
     def inputfile(self) -> Path:
         return self.outdir / "input.txt"
 
@@ -69,10 +67,6 @@ class DayPart(NamedTuple):
     @property
     def promptfile(self) -> Path:
         return self.outdir / "prompt.md"
-
-    def load_solution(self) -> Solution:
-        mod = importlib.import_module(f"day{self.day:02}.part{self.part}")
-        return mod.solution
 
     @classmethod
     def first(cls) -> DayPart:
@@ -97,7 +91,9 @@ class DayPart(NamedTuple):
         return _EMOJI_LIST[self.day - 1]
 
     def is_solved(self) -> bool:
-        return self.solutionfile.exists() and not os.access(self.solutionfile, os.W_OK)
+        return self.solutionfile.exists() and not os.access(
+            self.solutionfile, os.W_OK
+        )
 
     def mark_solved(self) -> None:
         self.solutionfile.chmod(0o444)
@@ -130,6 +126,10 @@ class DayPart(NamedTuple):
 
 @lru_cache(maxsize=1)
 def get_year() -> int:
+    """
+    Returns the advent of code year based on the
+    project's root directory name.
+    """
     rootdir = get_rootdir()
     *_, year = rootdir.name.partition("aoc")
     try:
@@ -141,25 +141,6 @@ def get_year() -> int:
         )
 
 
-def get_all_dayparts() -> list[DayPart]:
-    """
-    Returns a list of all previous day/part solutions in ascending order
-    """
-    rootdir = get_rootdir()
-    dayparts = []
-    for dd in rootdir.glob("day*/part*.py"):
-        m = _PARTFILE.search(str(dd))
-        if not m:
-            warnings.warn(f"skipping invalid day/part file: {dd}")
-            continue
-
-        dp = DayPart(*map(int, m.groups()))
-        dayparts.append(dp)
-
-    dayparts.sort()
-    return dayparts
-
-
 @dataclass
 class SelectionArgs:
     all: bool = False
@@ -167,8 +148,9 @@ class SelectionArgs:
     parts: list[int] = field(default_factory=list)
 
 
-def get_selections(dayparts: list[DayPart], args: SelectionArgs) -> list[DayPart]:
-    dayparts = dayparts[:]
+def get_selections(
+    dayparts: list[DayPart], args: SelectionArgs
+) -> list[DayPart]:
     if not dayparts:
         return []
 

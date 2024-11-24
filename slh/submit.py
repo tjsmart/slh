@@ -17,8 +17,8 @@ from ._calendar_html_parser import parse_calendar_stars_html_to_star_count
 from ._command_factory import Command
 from ._command_factory import register_command
 from ._daypart import DayPart
-from ._daypart import get_all_dayparts
 from ._daypart import get_year
+from ._plugin_factory import plugin
 from ._random_shit import Color
 from ._random_shit import get_cookie_headers
 from ._random_shit import get_rootdir
@@ -33,11 +33,11 @@ __all__ = [
 
 
 def main() -> int:
-    dayparts = get_all_dayparts()
+    dayparts = plugin().get_all_dayparts()
     if not dayparts:
         raise SystemExit("error: no files exist yet to submit!")
 
-    most_recent = dayparts.pop()
+    most_recent = dayparts[-1]
     return submit_daypart(most_recent)
 
 
@@ -55,7 +55,8 @@ def submit_daypart(dp: DayPart) -> int:
     except FileNotFoundError:
         raise SystemExit(f"error: no solution exists yet for: {dp}")
 
-    if dp.solutionfile.stat().st_mtime < dp.pyfile.stat().st_mtime:
+    src_file = plugin().get_src_file(dp)
+    if dp.solutionfile.stat().st_mtime < src_file.stat().st_mtime:
         print("solution has been modified, executing `run` again ...")
         from .run import run_selections
 
