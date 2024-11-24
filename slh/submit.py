@@ -14,11 +14,11 @@ from pathlib import Path
 
 from . import next as next_mod
 from ._calendar_html_parser import parse_calendar_stars_html_to_star_count
-from ._command_factory import Command
-from ._command_factory import register_command
+from ._commands import Command
+from ._commands import register_command
 from ._daypart import DayPart
 from ._daypart import get_year
-from ._plugin_factory import plugin
+from ._plugins import plugin
 from ._random_shit import Color
 from ._random_shit import get_cookie_headers
 from ._random_shit import get_rootdir

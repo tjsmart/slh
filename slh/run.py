@@ -8,12 +8,12 @@ from argparse import ArgumentParser
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from ._command_factory import Command
-from ._command_factory import register_command
+from ._commands import Command
+from ._commands import register_command
 from ._daypart import DayPart
 from ._daypart import get_selections
 from ._daypart import SelectionArgs
-from ._plugin_factory import plugin
+from ._plugins import plugin
 from ._random_shit import Color
 
 

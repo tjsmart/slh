@@ -4,8 +4,8 @@ from argparse import ArgumentParser
 from collections.abc import Callable
 from collections.abc import Sequence
 
-from ._command_factory import Command
-from ._command_factory import get_commands
+from ._commands import Command
+from ._commands import get_commands
 
 
 def main(argv: Sequence[str] | None = None) -> int:

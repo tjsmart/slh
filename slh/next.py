@@ -20,15 +20,15 @@ from itertools import cycle
 from pathlib import Path
 from typing import NoReturn
 
-from ._command_factory import Command
-from ._command_factory import register_command
+from ._commands import Command
+from ._commands import register_command
 from ._daypart import DayPart
 from ._daypart import get_year
 from ._prompt_html_parser import parse_prompt_html_to_md
 from ._random_shit import get_cookie_headers
 from ._random_shit import get_rootdir
 from ._random_shit import HandledError
-from ._plugin_factory import plugin
+from ._plugins import plugin
 
 
 __all__ = [
