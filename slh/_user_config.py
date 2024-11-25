@@ -26,7 +26,7 @@ def user_config() -> UserConfig:
     try:
         config_str = _CONFIG_FILE.read_text()
     except FileNotFoundError:
-        return UserConfig()  # default config
+        raise HandledError(f"please create a config file at {_CONFIG_FILE}")
     except OSError as err:
         raise HandledError(
             f"unable to read config file at {_CONFIG_FILE}"

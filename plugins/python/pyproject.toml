@@ -1,25 +1,29 @@
 [project]
-name = "slh"
+name = "slh-python"
 version = "0.0.0"
 authors = [{ name="Tyler Smart", email="tjsmart@ucsc.edu" }]
-description = "Scripts for Advent of Code."
+description = "Python plugin for SLH."
 requires-python = ">=3.12"
+dependencies = [
+	"slh @ git+https://github.com/tjsmart/slh.git",
+	"pytest",
+]
 
 [project.urls]
-"Homepage" = "https://github.com/tjsmart/slh"
+"Homepage" = "https://github.com/tjsmart/slh/plugins/python"
 
 [project.scripts]
-slh = "slh._main:main"
+py312to310 = "slh_python._py312to310:main"
 
-[project.optional-dependencies]
-dev = ["pytest"]
+[project.entry-points."slh"]
+python = "slh_python._plugin"
 
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["slh"]
+include = ["slh_python"]
 exclude = ["*tests*"]
 
 [tool.pyright]

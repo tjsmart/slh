@@ -1,4 +1,6 @@
 import ast
+from argparse import ArgumentParser
+from pathlib import Path
 
 
 def rewrite_312(src: str) -> str:
@@ -15,8 +17,8 @@ def rewrite_312(src: str) -> str:
             case ast.FunctionDef() | ast.ClassDef():
                 if node.type_params:
                     line = lines[node.lineno - 1]
-                    start, _, rest = line.partition('[')
-                    _, _, end = rest.partition(']')
+                    start, _, rest = line.partition("[")
+                    _, _, end = rest.partition("]")
                     lines[node.lineno - 1] = start + end
                     rw = True
 
@@ -26,7 +28,7 @@ def rewrite_312(src: str) -> str:
 
             case ast.TypeAlias():
                 type_nodes.append(node)
-                del lines[node.lineno -1]
+                del lines[node.lineno - 1]
                 assert not node.end_lineno or node.end_lineno == node.lineno
                 rw = True
 
@@ -55,14 +57,18 @@ def rewrite_312(src: str) -> str:
             case ast.TypeVar():
                 # TypeVar(name='T', bound=Name(id='int', ctx=Load()))
                 try:
-                    bound_str = f", bound={node.bound.id}"# type: ignore
+                    bound_str = f", bound={node.bound.id}"  # type: ignore
                 except AttributeError:
                     bound_str = ""
-                new_code.append(f"{node.name} = typing.TypeVar(\"{node.name}\"{bound_str})")
+                new_code.append(
+                    f'{node.name} = typing.TypeVar("{node.name}"{bound_str})'
+                )
 
             case ast.ParamSpec():
                 # ParamSpec(name='P')
-                new_code.append(f"{node.name} = typing.ParamSpec(\"{node.name}\")")
+                new_code.append(
+                    f'{node.name} = typing.ParamSpec("{node.name}")'
+                )
 
             case ast.TypeAlias():
                 # TypeAlias(
@@ -73,7 +79,9 @@ def rewrite_312(src: str) -> str:
                 if node.type_params:
                     raise NotImplemented(node.type_params)
 
-                new_code.append(f"{node.name.id}: typing.TypeAlias = {ast.unparse(node.value)}")
+                new_code.append(
+                    f"{node.name.id}: typing.TypeAlias = {ast.unparse(node.value)}"
+                )
 
     new_code.append("")
     lines[insert_at:insert_at] = new_code
@@ -82,3 +90,21 @@ def rewrite_312(src: str) -> str:
         lines.append("")
 
     return "\n".join(lines)
+
+
+def main() -> None:
+    parser = ArgumentParser()
+    parser.add_argument("-i", "--in-place", action="store_true")
+    parser.add_argument("filename", type=Path)
+    args = parser.parse_args()
+
+    filename: Path = args.filename
+    in_place: bool = args.in_place
+
+    old_src = filename.read_text()
+    new_src = rewrite_312(old_src)
+
+    if in_place:
+        filename.write_text(new_src)
+    else:
+        print(new_src)
