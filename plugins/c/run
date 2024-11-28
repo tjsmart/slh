@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+
+import subprocess
+import sys
+from argparse import ArgumentParser
+from pathlib import Path
+from typing import Literal
+
+
+THIS_DIR = Path(__file__).parent.resolve()
+BUILD_DIR = THIS_DIR / "build"
+
+Action = Literal["build"]
+Build = Literal["debug", "release"]
+
+
+def main() -> None:
+    parser = ArgumentParser()
+    parser.add_argument(
+        "action",
+        choices=Action.__args__,  # type: ignore
+    )
+    parser.add_argument(
+        "--build",
+        default="release",
+        choices=Build.__args__,  # type: ignore
+    )
+    args = parser.parse_args()
+
+    action: Action = args.action
+    assert action == "build"
+
+    build: Build = args.build
+
+    target_dir = BUILD_DIR / build
+    subprocess.run(
+        [sys.executable, "-m", "cmake", "-S", THIS_DIR, "-B", target_dir],
+        check=True,
+    )
+    subprocess.run(
+        [sys.executable, "-m", "cmake", "--build", target_dir],
+        check=True,
+    )
+
+
+if __name__ == "__main__":
+    main()
