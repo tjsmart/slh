@@ -6,6 +6,7 @@ description = "C plugin for SLH."
 requires-python = ">=3.12"
 dependencies = [
 	"slh @ git+https://github.com/tjsmart/slh.git",
+	"cmake>=3.21",
 ]
 
 [project.urls]

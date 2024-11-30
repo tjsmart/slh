@@ -1,10 +1,10 @@
 import re
+import shutil
 import subprocess
 import sys
 import warnings
 from pathlib import Path
 
-import pytest
 from slh import DayPart
 from slh import get_rootdir
 from slh import Solution
@@ -21,8 +21,10 @@ __all__ = [
 
 
 _PARTFILE = re.compile(r".*/day(\d\d)/part(\d)\.c")
-# _THIS_DIR = Path(__file__).resolve().parent
-# _TEMPLATE_PART_PYFILE = _THIS_DIR / "_template_part.py"
+_THIS_DIR = Path(__file__).resolve().parent
+_TEMPLATE_DIR = _THIS_DIR / "templates"
+_TEMPLATE_CMAKE_FILE = _TEMPLATE_DIR / "CMakeLists.txt"
+_TEMPLATE_DAY_DIR = _TEMPLATE_DIR / "day00"
 
 
 LANGUAGE = "c"
@@ -52,21 +54,32 @@ def get_src_file(dp: DayPart, /) -> Path:
 
 
 def generate_next_files(year: int, next: DayPart, prev: DayPart | None) -> None:
+    ROOT_CMAKE = Path.cwd() / "CMakeLists.txt"
+    if not ROOT_CMAKE.exists():
+        shutil.copy(_TEMPLATE_CMAKE_FILE, ROOT_CMAKE)
+
     next_src_file = get_src_file(next)
     assert (
         not next_src_file.exists()
     ), f"Whoops, {next_src_file} already exists!"
 
     if not prev or next.part == 1:
-        # TODO: add template part1.c and CMakeLists.txt
-        prev_src = _TEMPLATE_PART_PYFILE.read_text()
+        for file in _TEMPLATE_DAY_DIR.iterdir():
+            shutil.copyfile(file, next.outdir / file.name)
     else:
-        # TODO: copy part1.c to part2.c and update CMakeLists.txt
-        #       to include build for part2
-        prev_src_file = get_src_file(prev)
-        prev_src = prev_src_file.read_text()
+        prev_src = get_src_file(prev).read_text()
+        next_src_file.write_text(prev_src)
+        with open(next.outdir / "CMakeLists.txt", "wa") as cmake:
+            cmake.writelines(
+                [
+                    "add_executable(part2 part2.c)",
+                    "set_target_properties(",
+                    "	part2 PROPERTIES RUNTIME_OUTPUT_DIRECTORY",
+                    "	${CMAKE_CURRENT_SOURCE_DIR}",
+                    ")",
+                ]
+            )
 
-    next_src_file.write_text(prev_src)
     print(f"... {next_src_file} written ✅")
 
 
@@ -74,9 +87,7 @@ def run_daypart_tests(
     dayparts: list[DayPart], test_args: list[str] | None
 ) -> int:
     # TODO: need to lookup a c test framework
-    args = [*test_args, "--"] if test_args else ["--"]
-    args.extend(str(get_src_file(dp)) for dp in dayparts)
-    return pytest.main(args)
+    raise NotImplementedError("No testing functionality, yet!")
 
 
 def load_solution(dp: DayPart) -> Solution:

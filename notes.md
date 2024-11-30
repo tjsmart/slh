@@ -2,8 +2,10 @@
 - [x] cleanup
 - [x] works for python
 - [x] supports plugins
+- [x] works for c
+
+# Eventually:
 - [ ] tests work
-- [ ] works for c
 
 hashing: http://www.cse.yorku.ca/~oz/hash.html
 

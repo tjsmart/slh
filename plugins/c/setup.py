@@ -53,6 +53,7 @@ class IncludeExtraFiles(bdist_wheel):
     def run(self):
         build()
 
+        SLH_DIR.mkdir(exist_ok=True)
         with temp_lib(), temp_include():
             super().run()
 
