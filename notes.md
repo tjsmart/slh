@@ -4,6 +4,19 @@
 - [x] supports plugins
 - [x] works for c
 
+- [x] start previous aoc year with plugin
+    - [ ] work out kinks
+        - [ ] debug improvements
+        - [ ] testing
+    - [ ] develop slh lib
+        - [x] read file
+        - [ ] link list
+        - [ ] hash map
+        - [ ] points
+        - [ ] matrix
+
+- [ ] run without submit (for debugging without getting errors)
+
 # Eventually:
 - [ ] tests work
 

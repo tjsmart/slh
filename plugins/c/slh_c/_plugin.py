@@ -106,7 +106,7 @@ def load_solution(dp: DayPart) -> Solution:
 
 
 def _get_exe_file(dp: DayPart) -> Path:
-    return dp.outdir / f"part{dp}"
+    return dp.outdir / f"part{dp.part}"
 
 
 def _build(dp: DayPart, debug: bool = False) -> None:

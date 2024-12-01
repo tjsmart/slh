@@ -12,11 +12,10 @@ execute_process(
 	RESULT_VARIABLE GET_SLH_DIR_RESULT
 	OUTPUT_VARIABLE SLH_DIR
 	OUTPUT_STRIP_TRAILING_WHITESPACE
+	ERROR_VARIABLE GET_SLH_DIR_ERROR
 )
 if(NOT GET_SLH_DIR_RESULT EQUAL 0)
-	message(FATAL_ERROR "Failed to get SLH directory")
-else()
-	message(STATUS "Python command output: ${SLH_DIR}")
+	message(FATAL_ERROR "Failed to get SLH directory: ${GET_SLH_DIR_ERROR}")
 endif()
 
 include_directories(${SLH_DIR}/include)
