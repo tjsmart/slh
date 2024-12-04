@@ -25,6 +25,7 @@ _THIS_DIR = Path(__file__).resolve().parent
 _TEMPLATE_DIR = _THIS_DIR / "templates"
 _TEMPLATE_CMAKE_FILE = _TEMPLATE_DIR / "CMakeLists.txt"
 _TEMPLATE_DAY_DIR = _TEMPLATE_DIR / "day00"
+_TEMPLATE_DAY_CMAKE_FILE = _TEMPLATE_DAY_DIR / "CMakeLists.txt"
 
 
 LANGUAGE = "c"
@@ -65,20 +66,22 @@ def generate_next_files(year: int, next: DayPart, prev: DayPart | None) -> None:
 
     if not prev or next.part == 1:
         for file in _TEMPLATE_DAY_DIR.iterdir():
-            shutil.copyfile(file, next.outdir / file.name)
+            src = (
+                file.read_text()
+                .replace("day00", f"day{next.day:02}")
+                .replace("part0", f"part{next.part}")
+            )
+            (next.outdir / file.name).write_text(src)
     else:
         prev_src = get_src_file(prev).read_text()
         next_src_file.write_text(prev_src)
+        cmake_addition = (
+            _TEMPLATE_DAY_CMAKE_FILE.read_text()
+            .replace("day00", f"day{next.day:02}")
+            .replace("part0", f"part{next.part}")
+        )
         with open(next.outdir / "CMakeLists.txt", "a") as cmake:
-            cmake.writelines(
-                [
-                    "add_executable(part2 part2.c)",
-                    "set_target_properties(",
-                    "	part2 PROPERTIES RUNTIME_OUTPUT_DIRECTORY",
-                    "	${CMAKE_CURRENT_SOURCE_DIR}",
-                    ")",
-                ]
-            )
+            cmake.write(cmake_addition)
 
     print(f"... {next_src_file} written ✅")
 

@@ -1,5 +1,6 @@
-add_executable(part1 part1.c)
+add_executable(day00_part0 part0.c)
 set_target_properties(
-	part1 PROPERTIES RUNTIME_OUTPUT_DIRECTORY
-	${CMAKE_CURRENT_SOURCE_DIR}
+	day00_part0 PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	OUTPUT_NAME part0
 )
