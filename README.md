@@ -106,7 +106,7 @@ provided day/part puzzle. By default this will run the latest
 created puzzle.
 
 ```console
-$ slh run --help                                                               185ms
+$ slh run --help
 usage: slh run [-h] [--all] [--days DAYS] [--parts PARTS] [--test] [--count COUNT]
 
 Execute specified solutions, by default the most recent solution is executed.
@@ -126,7 +126,7 @@ This is the final command you will want to run. It will submit the
 provided day/part puzzle.
 
 ```console
-$ slh submit --help                                                               185ms
+$ slh submit --help
 usage: slh submit [-h]
 
 Submit the specified solutions, by default the most recent solution is submitted.

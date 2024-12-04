@@ -6,8 +6,11 @@
 
 - [x] start previous aoc year with plugin
     - [ ] work out kinks
+        - [ ] slh run doesn't run latest/current
+        - [ ] cmakelists.txt issues (append new doesn't work and target collisions)
         - [ ] debug improvements
         - [ ] testing
+        - [ ] LSP!!
     - [ ] develop slh lib
         - [x] read file
         - [ ] link list

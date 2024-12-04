@@ -69,7 +69,7 @@ def generate_next_files(year: int, next: DayPart, prev: DayPart | None) -> None:
     else:
         prev_src = get_src_file(prev).read_text()
         next_src_file.write_text(prev_src)
-        with open(next.outdir / "CMakeLists.txt", "wa") as cmake:
+        with open(next.outdir / "CMakeLists.txt", "a") as cmake:
             cmake.writelines(
                 [
                     "add_executable(part2 part2.c)",

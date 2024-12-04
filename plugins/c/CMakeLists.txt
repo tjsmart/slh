@@ -7,6 +7,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 add_library(
 	slh STATIC
 	src/input.c
+	src/list.c
 	src/ptr.c
 	src/slh.c
 )
