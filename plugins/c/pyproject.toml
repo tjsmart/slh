@@ -28,3 +28,8 @@ pythonVersion = "3.12"
 [tool.black]
 line-length = 80
 target-version = ["py312"]
+
+[dependency-groups]
+dev = [
+    "cmake>=4.1.2",
+]

@@ -4,6 +4,8 @@ project(slh VERSION 0.0.0 LANGUAGES C)
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_library(
 	slh STATIC
 	src/input.c
@@ -12,3 +14,5 @@ add_library(
 	src/slh.c
 )
 target_include_directories(slh PUBLIC include)
+
+add_subdirectory(tests)

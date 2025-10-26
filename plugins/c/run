@@ -3,15 +3,25 @@
 import subprocess
 import sys
 from argparse import ArgumentParser
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Literal
-
 
 THIS_DIR = Path(__file__).parent.resolve()
 BUILD_DIR = THIS_DIR / "build"
 
-Action = Literal["build"]
+Action = Literal["build", "test"]
 Build = Literal["debug", "release"]
+
+
+def runmod(args: Sequence[str | Path]) -> None:
+    result = subprocess.run(
+        [sys.executable, "-m", *args],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise SystemExit(result.stderr)
 
 
 def main() -> None:
@@ -22,25 +32,22 @@ def main() -> None:
     )
     parser.add_argument(
         "--build",
-        default="release",
+        default="debug",
         choices=Build.__args__,  # type: ignore
     )
     args = parser.parse_args()
 
     action: Action = args.action
-    assert action == "build"
-
     build: Build = args.build
 
     target_dir = BUILD_DIR / build
-    subprocess.run(
-        [sys.executable, "-m", "cmake", "-S", THIS_DIR, "-B", target_dir],
-        check=True,
-    )
-    subprocess.run(
-        [sys.executable, "-m", "cmake", "--build", target_dir],
-        check=True,
-    )
+    runmod(["cmake", "-S", THIS_DIR, "-B", target_dir])
+    runmod(["cmake", "--build", target_dir])
+
+    if action == "test":
+        test_dir = target_dir / "tests"
+        for test in test_dir.glob("test_*"):
+            subprocess.run([test])
 
 
 if __name__ == "__main__":
