@@ -33,6 +33,7 @@ TEST(test_slh_list_prepend) {
     }
 
     int i = 0;
+    auto front = node;
     while (node != NULL) {
         assert(node->value == i * i);
         node = node->next;
@@ -41,7 +42,7 @@ TEST(test_slh_list_prepend) {
 
     assert(i == 100);
 
-    slh_list_free(node);
+    slh_list_free(front);
 }
 
 TEST(test_slh_list_append) {
@@ -51,6 +52,7 @@ TEST(test_slh_list_append) {
     }
 
     int i = 0;
+    auto front = node;
     while (node != NULL) {
         assert(node->value == i * i);
         node = node->next;
@@ -59,7 +61,7 @@ TEST(test_slh_list_append) {
 
     assert(i == 100);
 
-    slh_list_free(node);
+    slh_list_free(front);
 }
 
 void assert_values_are_incrementing(slh_node_t *node) {
