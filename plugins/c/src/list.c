@@ -39,6 +39,15 @@ void slh_list_append(slh_node_t** node, int32_t value) {
 	}
 }
 
+void slh_list_free(slh_node_t* node) {
+	slh_node_t* temp = NULL;
+	while (node != NULL) {
+		temp = node;
+		node = node->next;
+		free(temp);
+	}
+}
+
 void slh_list_map(slh_node_t* node, void(*map)(slh_node_t*)) {
 	if (node == NULL) {
 		return;
@@ -51,13 +60,13 @@ void slh_list_print(slh_node_t* node) {
 	void print_node(slh_node_t* node) {
 		printf("%d", node->value);
 		if (node->next != NULL) {
-			printf("->");
-		} else {
-			printf("\n");
+			printf(", ");
 		}
 	}
 
+	printf("[");
 	slh_list_map(node, &print_node);
+	printf("]");
 }
 
 void slh_list_sort(slh_node_t** head) {
@@ -96,4 +105,38 @@ void slh_list_sort(slh_node_t** head) {
 			next=curr->next;
 		}
 	} while(swapped);
+}
+
+size_t slh_list_size(slh_node_t* node) {
+	size_t size = 0;
+	void inc(slh_node_t* node) {
+		size++;
+	}
+
+	slh_list_map(node, &inc);
+	return size;
+}
+
+slh_node_t* slh_list_index(slh_node_t* node, size_t idx) {
+	size_t loc = 0;
+	while ((node != NULL) && (loc != idx)) {
+		node = node->next;
+		loc++;
+	}
+	return loc == idx ? node : NULL;
+}
+
+slh_node_t* slh_list_find(slh_node_t* node, bool(*map)(slh_node_t*)) {
+	while ((node != NULL) && (!map(node))) {
+		node = node->next;
+	}
+	return node;
+}
+
+bool slh_list_contains(slh_node_t* node, int32_t value) {
+	bool eq_value(slh_node_t* node) {
+		return node->value == value;
+	}
+
+	return slh_list_find(node, &eq_value) != NULL;
 }

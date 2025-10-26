@@ -49,3 +49,5 @@ hashing: http://www.cse.yorku.ca/~oz/hash.html
 - add solution times to README.md
 
 - profiling support
+
+- slh run saves off 'too high' or 'too low' comment so you know last suggestion

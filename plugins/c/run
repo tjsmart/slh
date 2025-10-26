@@ -10,7 +10,7 @@ from typing import Literal
 THIS_DIR = Path(__file__).parent.resolve()
 BUILD_DIR = THIS_DIR / "build"
 
-Action = Literal["build"]
+Action = Literal["build", "test"]
 Build = Literal["debug", "release"]
 
 
@@ -28,8 +28,6 @@ def main() -> None:
     args = parser.parse_args()
 
     action: Action = args.action
-    assert action == "build"
-
     build: Build = args.build
 
     target_dir = BUILD_DIR / build
@@ -41,6 +39,11 @@ def main() -> None:
         [sys.executable, "-m", "cmake", "--build", target_dir],
         check=True,
     )
+
+    if action == "test":
+        test_dir = target_dir / "tests"
+        for test in test_dir.glob("test_*"):
+            subprocess.run([test])
 
 
 if __name__ == "__main__":
