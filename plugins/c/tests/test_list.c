@@ -26,6 +26,24 @@ TEST(test_slh_list_end) {
 
 TEST(test_slh_list_end_handles_null) { assert(slh_list_end(NULL) == NULL); }
 
+TEST(test_slh_list_prepend) {
+    slh_node_t *node = NULL;
+    for (int i = 99; i >= 0; --i) {
+        slh_list_prepend(&node, i * i);
+    }
+
+    int i = 0;
+    while (node != NULL) {
+        assert(node->value == i * i);
+        node = node->next;
+        i++;
+    }
+
+    assert(i == 100);
+
+    slh_list_free(node);
+}
+
 TEST(test_slh_list_append) {
     slh_node_t *node = NULL;
     for (int i = 0; i < 100; ++i) {
@@ -111,13 +129,47 @@ TEST(test_slh_list_index) {
     slh_list_free(node);
 }
 
-// TODO: test find
-// slh_node_t* slh_list_find(slh_node_t* node, bool(*map)(slh_node_t*));
+TEST(test_slh_list_find) {
+    slh_node_t *node = NULL;
+    for (int i = 0; i < 10; ++i) {
+        slh_list_append(&node, i);
+    }
 
-// TODO: test contains
-// bool slh_list_contains(slh_node_t* node, int32_t value);
+    int32_t value = 0;
 
-// TODO: add/test prepend
-// void slh_list_prepend(slh_node_t** node, int32_t value);
+    bool find_value(slh_node_t * node) { return node->value == value; };
+
+    value = 5;
+    auto found_node = slh_list_find(node, find_value);
+    assert(found_node != NULL);
+    assert(found_node->value == 5);
+
+    value = 10;
+    found_node = slh_list_find(node, find_value);
+    assert(found_node == NULL);
+
+    found_node = slh_list_find(NULL, find_value);
+    assert(found_node == NULL);
+
+    slh_list_free(node);
+}
+
+TEST(test_slh_list_contains) {
+    slh_node_t *node = NULL;
+    for (int i = 0; i < 10; ++i) {
+        slh_list_append(&node, i);
+    }
+
+    auto value = slh_list_contains(node, 5);
+    assert(value == true);
+
+    value = slh_list_contains(node, 10);
+    assert(value == false);
+
+    value = slh_list_contains(NULL, 1);
+    assert(value == false);
+
+    slh_list_free(node);
+}
 
 MAIN(test_list)

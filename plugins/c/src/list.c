@@ -24,6 +24,13 @@ slh_node_t *slh_list_end(slh_node_t *node) {
     return end;
 }
 
+void slh_list_prepend(slh_node_t **node, int32_t value) {
+    slh_node_t *first = slh_list_create_node(value);
+
+    first->next = *node;
+    *node = first;
+}
+
 void slh_list_append(slh_node_t **node, int32_t value) {
     slh_node_t *next = slh_list_create_node(value);
 
@@ -124,8 +131,8 @@ slh_node_t *slh_list_index(slh_node_t *node, size_t idx) {
     return loc == idx ? node : NULL;
 }
 
-slh_node_t *slh_list_find(slh_node_t *node, bool (*map)(slh_node_t *)) {
-    while ((node != NULL) && (!map(node))) {
+slh_node_t *slh_list_find(slh_node_t *node, bool (*predicate)(slh_node_t *)) {
+    while ((node != NULL) && (!predicate(node))) {
         node = node->next;
     }
     return node;

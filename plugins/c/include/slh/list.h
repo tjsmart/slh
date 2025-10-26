@@ -13,6 +13,8 @@ slh_node_t *slh_list_create_node(int32_t value);
 
 slh_node_t *slh_list_end(slh_node_t *node);
 
+void slh_list_prepend(slh_node_t **node, int32_t value);
+
 void slh_list_append(slh_node_t **node, int32_t value);
 
 void slh_list_free(slh_node_t *node);
@@ -27,7 +29,7 @@ size_t slh_list_size(slh_node_t *node);
 
 slh_node_t *slh_list_index(slh_node_t *node, size_t idx);
 
-slh_node_t *slh_list_find(slh_node_t *node, bool (*map)(slh_node_t *));
+slh_node_t *slh_list_find(slh_node_t *node, bool (*predicate)(slh_node_t *));
 
 bool slh_list_contains(slh_node_t *node, int32_t value);
 
