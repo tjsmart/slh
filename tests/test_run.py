@@ -1,6 +1,6 @@
 import pytest
 
-from ..run import _format_duration
+from slh.run import _format_duration
 
 
 @pytest.mark.parametrize(

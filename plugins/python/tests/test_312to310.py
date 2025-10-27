@@ -1,4 +1,4 @@
-from .._pypy import rewrite_312
+from slh_python._py312to310 import rewrite_312
 
 
 def test_rewrite_one_function():

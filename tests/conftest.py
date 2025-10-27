@@ -5,14 +5,14 @@ from unittest.mock import patch
 
 import pytest
 
-from .. import _random_shit
-
 
 @pytest.fixture
 def rootdir():
+    from slh import _daypart
+
     startingdir = Path.cwd()
     with (
-        patch.object(_random_shit, "get_rootdir") as mock_get_rootdir,
+        patch.object(_daypart, "get_rootdir") as mock_get_rootdir,
         TemporaryDirectory() as tempd,
     ):
         rootdir = Path(tempd) / "aoc1994"

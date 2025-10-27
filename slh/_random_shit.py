@@ -7,7 +7,6 @@ from enum import Enum
 from functools import lru_cache
 from pathlib import Path
 
-
 logger = logging.getLogger("slh")
 THIS_DIR = Path(__file__).resolve().parent
 

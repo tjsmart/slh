@@ -1,7 +1,7 @@
 import pytest
 
-from ..math import Inf
-from ..math import NegInf
+from slh_python.math import Inf
+from slh_python.math import NegInf
 
 
 @pytest.mark.parametrize("value", [-1, 0, 1, 100000])

@@ -3,12 +3,13 @@ from dataclasses import dataclass
 
 import pytest
 
-from .._random_shit import DayPart
-from .._random_shit import get_all_dayparts
-from .._random_shit import get_rootdir
-from .._random_shit import get_selections
-from .._random_shit import HandledError
-from .._random_shit import SelectionArgs
+from slh._daypart import (
+    DayPart,
+    HandledError,
+    SelectionArgs,
+    get_rootdir,
+    get_selections,
+)
 
 
 def test_daypart_next_raises_on_last_day():
@@ -29,27 +30,9 @@ def test_daypart_next_returns_next_part():
 def test_get_rootdir():
     get_rootdir.cache_clear()
 
-    rootdir = str(get_rootdir())
+    rootdir = get_rootdir()
 
-    assert re.match(r".*/aoc\d\d\d\d", rootdir)
-
-
-@pytest.mark.usefixtures("rootdir")
-def test_get_all_dayparts_empty():
-    assert get_all_dayparts() == []
-
-
-def test_get_all_dayparts(rootdir):
-    (rootdir / "day01").mkdir()
-    (rootdir / "day01" / "part1.py").touch()
-    (rootdir / "day01" / "part2.py").touch()
-    (rootdir / "day02").mkdir()
-    (rootdir / "day02" / "part1.py").touch()
-    (rootdir / "day03").mkdir()
-    (rootdir / "day03" / "part2.py").touch()
-    (rootdir / "day04").mkdir()
-
-    assert get_all_dayparts() == [(1, 1), (1, 2), (2, 1), (3, 2)]
+    assert (rootdir / ".git").exists()
 
 
 @dataclass

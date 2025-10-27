@@ -1,10 +1,11 @@
 import pytest
-
-from ..parser import collect_block_lines
-from ..parser import collect_block_statements
-from ..parser import collect_lines
-from ..parser import FrozenGrid
-from ..parser import Point
+from slh_python.parser import (
+    FrozenGrid,
+    Point,
+    collect_block_lines,
+    collect_block_statements,
+    collect_lines,
+)
 
 
 def test_collect_lines():
