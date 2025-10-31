@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import subprocess
 import sys
 from argparse import ArgumentParser
@@ -35,19 +36,43 @@ def main() -> None:
         default="debug",
         choices=Build.__args__,  # type: ignore
     )
+    parser.add_argument(
+        "--gdb",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-k",
+        default=None,
+        type=str,
+    )
     args = parser.parse_args()
 
     action: Action = args.action
     build: Build = args.build
+    gdb: bool = args.gdb
 
     target_dir = BUILD_DIR / build
-    runmod(["cmake", "-S", THIS_DIR, "-B", target_dir])
+    runmod(
+        [
+            "cmake",
+            "-S",
+            THIS_DIR,
+            "-B",
+            target_dir,
+            f"-DCMAKE_BUILD_TYPE={build.capitalize()}",
+        ]
+    )
     runmod(["cmake", "--build", target_dir])
 
     if action == "test":
         test_dir = target_dir / "tests"
-        for test in test_dir.glob("test_*"):
-            subprocess.run([test])
+        tests = [str(t) for t in test_dir.glob("test_*")]
+        if args.k:
+            tests = [t for t in tests if args.k in t]
+        if gdb:
+            tests = [f"gdb -ex run --args {t}" for t in tests]
+
+        os.execv("/bin/bash", ["bash", "-c", " && ".join(tests)])
 
 
 if __name__ == "__main__":

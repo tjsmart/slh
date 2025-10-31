@@ -12,6 +12,7 @@ add_library(
 	src/list.c
 	src/ptr.c
 	src/slh.c
+	src/vec.c
 )
 target_include_directories(slh PUBLIC include)
 

@@ -44,8 +44,9 @@ void __print_banner(char *name) {
     }
     char banner[width + 1];
     banner[width] = '\0';
-    memset(banner, '-', width);
+    memset(banner, '~', width);
     memcpy(banner, name, strlen(name));
+    banner[strlen(name)] = ' ';
     printf("%s\n", banner);
 }
 
